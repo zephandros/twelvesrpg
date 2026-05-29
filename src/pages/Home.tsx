@@ -1,5 +1,31 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
+function CopyCodeButton({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false)
+
+  function handleClick(e: React.MouseEvent) {
+    e.stopPropagation()
+    navigator.clipboard.writeText(code).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    })
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      className="flex flex-col items-end gap-0.5 shrink-0"
+    >
+      <span className="text-[10px] font-mono text-ink-faint tracking-widest">
+        {code}
+      </span>
+      <span className="text-[8px] tracking-wide uppercase text-ink-faint opacity-60">
+        {copied ? '¡Copiado!' : 'Copiar'}
+      </span>
+    </button>
+  )
+}
 import {
   collection,
   query,
@@ -94,9 +120,7 @@ export default function Home() {
                     </p>
                   )}
                 </div>
-                <span className="text-[10px] font-mono text-ink-faint tracking-widest">
-                  {room.code}
-                </span>
+                <CopyCodeButton code={room.code} />
               </button>
             </li>
           ))}
