@@ -32,6 +32,12 @@ Thumbs.db
 *.swp
 *.swo
 
+# TypeScript build info
+*.tsbuildinfo
+
+# pnpm
+pnpm-workspace.yaml
+
 # Misc
 .cache/
 coverage/
