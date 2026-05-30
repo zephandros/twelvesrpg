@@ -7,6 +7,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { useTheme, type Mode } from '@/contexts/ThemeContext'
 import { useLocale } from '@/contexts/LocaleContext'
 import { localeLabels } from '@/locales'
+import { getFirebaseErrorKey } from '@/lib/firebaseError'
+import { notify } from '@/lib/notify'
 
 const MODES: Mode[] = ['light', 'dark']
 
@@ -20,7 +22,6 @@ export default function Settings() {
   const [initialName, setInitialName] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [saveErr, setSaveErr] = useState('')
 
   useEffect(() => {
     if (!user) return
@@ -36,7 +37,6 @@ export default function Settings() {
   async function handleSaveName() {
     if (!user) return
     setSaving(true)
-    setSaveErr('')
     try {
       await setDoc(
         doc(db, 'users', user.uid),
@@ -47,8 +47,8 @@ export default function Settings() {
       setInitialName(displayName)
       setSaved(true)
       setTimeout(() => setSaved(false), 1500)
-    } catch {
-      setSaveErr(t('saveError'))
+    } catch (err: unknown) {
+      notify(t(getFirebaseErrorKey(err)))
     } finally {
       setSaving(false)
     }
@@ -120,12 +120,10 @@ export default function Settings() {
           <input
             type="text"
             value={displayName}
-            onChange={(e) => { setDisplayName(e.target.value); setSaveErr('') }}
+            onChange={(e) => setDisplayName(e.target.value)}
             className="border-b border-border pb-2 text-base bg-transparent outline-none focus:border-ink transition-colors"
           />
         </div>
-
-        {saveErr && <p className="text-[11px] text-red-500">{saveErr}</p>}
 
         {hasChanges && (
           <button

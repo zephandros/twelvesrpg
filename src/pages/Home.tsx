@@ -11,6 +11,8 @@ import {
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/contexts/LocaleContext'
+import { getFirebaseErrorKey } from '@/lib/firebaseError'
+import { notify } from '@/lib/notify'
 
 interface Room {
   id: string
@@ -104,10 +106,16 @@ export default function Home() {
         where('players', 'array-contains', user.uid),
       ),
     )
-    return onSnapshot(q, (snap) => {
-      setRooms(snap.docs.map((d) => fromDoc(d.id, d.data())))
-    })
-  }, [user])
+    return onSnapshot(
+      q,
+      (snap) => {
+        setRooms(snap.docs.map((d) => fromDoc(d.id, d.data())))
+      },
+      (err) => {
+        notify(t(getFirebaseErrorKey(err)))
+      },
+    )
+  }, [user, t])
 
   const myRooms = rooms.filter((r) => r.hostId === user?.uid)
   const joinedRooms = rooms.filter((r) => r.hostId !== user?.uid)

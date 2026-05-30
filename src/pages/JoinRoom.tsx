@@ -11,6 +11,8 @@ import {
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/contexts/LocaleContext'
+import { getFirebaseErrorKey } from '@/lib/firebaseError'
+import { notify } from '@/lib/notify'
 
 export default function JoinRoom() {
   const { user } = useAuth()
@@ -18,26 +20,24 @@ export default function JoinRoom() {
   const navigate = useNavigate()
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!user) return
     setLoading(true)
-    setError('')
     try {
       const snap = await getDocs(
         query(collection(db, 'rooms'), where('code', '==', code.trim().toUpperCase())),
       )
       if (snap.empty) {
-        setError(t('invalidCodeError'))
+        notify(t('invalidCodeError'))
         return
       }
       const roomDoc = snap.docs[0]
       await updateDoc(roomDoc.ref, { players: arrayUnion(user.uid) })
       navigate(`/room/${roomDoc.id}`)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t('joinRoomError'))
+      notify(t(getFirebaseErrorKey(err)))
     } finally {
       setLoading(false)
     }
@@ -68,8 +68,6 @@ export default function JoinRoom() {
             className="border-b border-border pb-2 text-xl font-mono tracking-[0.2em] bg-transparent outline-none focus:border-ink transition-colors uppercase"
           />
         </div>
-
-        {error && <p className="text-[11px] text-red-500">{error}</p>}
 
         <button
           type="submit"

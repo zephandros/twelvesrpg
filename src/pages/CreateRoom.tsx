@@ -4,6 +4,8 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocale } from '@/contexts/LocaleContext'
+import { getFirebaseErrorKey } from '@/lib/firebaseError'
+import { notify } from '@/lib/notify'
 
 function generateCode(length = 6): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -18,13 +20,11 @@ export default function CreateRoom() {
   const [description, setDescription] = useState('')
   const [maxPlayers, setMaxPlayers] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!user) return
     setLoading(true)
-    setError('')
     try {
       const doc = await addDoc(collection(db, 'rooms'), {
         name: name.trim(),
@@ -37,7 +37,7 @@ export default function CreateRoom() {
       })
       navigate(`/room/${doc.id}`)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t('createRoomError'))
+      notify(t(getFirebaseErrorKey(err)))
       setLoading(false)
     }
   }
@@ -93,8 +93,6 @@ export default function CreateRoom() {
             className="border-b border-border pb-2 text-base bg-transparent outline-none focus:border-ink transition-colors"
           />
         </div>
-
-        {error && <p className="text-[11px] text-red-500">{error}</p>}
 
         <button
           type="submit"

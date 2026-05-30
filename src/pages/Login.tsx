@@ -7,6 +7,8 @@ import {
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
 import { useLocale } from '@/contexts/LocaleContext'
+import { getFirebaseErrorKey } from '@/lib/firebaseError'
+import { notify } from '@/lib/notify'
 
 type Mode = 'login' | 'register'
 
@@ -16,18 +18,15 @@ export default function Login() {
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   function switchMode(m: Mode) {
     setMode(m)
-    setError('')
     setDisplayName('')
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    setError('')
     setLoading(true)
     try {
       if (mode === 'login') {
@@ -42,7 +41,7 @@ export default function Login() {
         })
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
+      notify(t(getFirebaseErrorKey(err)))
     } finally {
       setLoading(false)
     }
@@ -114,8 +113,6 @@ export default function Login() {
               className="border-b border-border pb-2 text-base bg-transparent outline-none focus:border-ink transition-colors"
             />
           </div>
-
-          {error && <p className="text-[11px] text-red-500">{error}</p>}
 
           <button
             type="submit"

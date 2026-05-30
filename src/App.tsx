@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'sonner'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { LocaleProvider } from '@/contexts/LocaleContext'
 import { useAuth } from '@/hooks/useAuth'
@@ -47,6 +48,7 @@ export default function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    <Toaster position="bottom-center" richColors />
     </LocaleProvider>
   </ThemeProvider>
   )
