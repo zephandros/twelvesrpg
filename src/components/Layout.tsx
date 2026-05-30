@@ -1,12 +1,10 @@
-import { Outlet, NavLink } from 'react-router-dom'
-import { signOut } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
-import { useAuth } from '@/hooks/useAuth'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { Settings as SettingsIcon } from 'lucide-react'
 import { useLocale } from '@/contexts/LocaleContext'
 
 export default function Layout() {
-  const { user } = useAuth()
   const { t } = useLocale()
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen flex flex-col bg-surface">
@@ -18,43 +16,18 @@ export default function Layout() {
             </p>
             <p className="text-xl font-bold tracking-tight">{t('appName')}</p>
           </div>
-          {user && (
-            <button
-              onClick={() => signOut(auth)}
-              className="text-xs text-ink-faint hover:text-ink transition-colors"
-            >
-              {t('navSignOut')}
-            </button>
-          )}
+          <button
+            onClick={() => navigate('/settings')}
+            className="text-ink-faint hover:text-ink transition-colors p-1"
+            aria-label={t('navSettings')}
+          >
+            <SettingsIcon size={18} />
+          </button>
         </header>
 
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>
-
-        <nav className="border-t border-border flex">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              `flex-1 py-3 text-center text-[10px] font-semibold tracking-widest uppercase transition-colors ${
-                isActive ? 'text-ink' : 'text-ink-faint'
-              }`
-            }
-          >
-            {t('navRooms')}
-          </NavLink>
-          <NavLink
-            to="/settings"
-            className={({ isActive }) =>
-              `flex-1 py-3 text-center text-[10px] font-semibold tracking-widest uppercase transition-colors ${
-                isActive ? 'text-ink' : 'text-ink-faint'
-              }`
-            }
-          >
-            {t('navSettings')}
-          </NavLink>
-        </nav>
       </div>
     </div>
   )

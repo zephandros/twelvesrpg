@@ -2,8 +2,10 @@ import { useState, type FormEvent } from 'react'
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  updateProfile,
 } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { auth, db } from '@/lib/firebase'
 import { useLocale } from '@/contexts/LocaleContext'
 
 type Mode = 'login' | 'register'
@@ -11,10 +13,17 @@ type Mode = 'login' | 'register'
 export default function Login() {
   const { t } = useLocale()
   const [mode, setMode] = useState<Mode>('login')
+  const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  function switchMode(m: Mode) {
+    setMode(m)
+    setError('')
+    setDisplayName('')
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -24,7 +33,13 @@ export default function Login() {
       if (mode === 'login') {
         await signInWithEmailAndPassword(auth, email, password)
       } else {
-        await createUserWithEmailAndPassword(auth, email, password)
+        const { user } = await createUserWithEmailAndPassword(auth, email, password)
+        await updateProfile(user, { displayName })
+        await setDoc(doc(db, 'users', user.uid), {
+          displayName,
+          email: user.email,
+          createdAt: serverTimestamp(),
+        })
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error desconocido')
@@ -47,11 +62,9 @@ export default function Login() {
           {(['login', 'register'] as Mode[]).map((m) => (
             <button
               key={m}
-              onClick={() => { setMode(m); setError('') }}
+              onClick={() => switchMode(m)}
               className={`flex-1 pb-2.5 text-[11px] font-medium tracking-[0.06em] uppercase transition-colors border-b-2 -mb-px ${
-                mode === m
-                  ? 'text-ink border-ink'
-                  : 'text-ink-faint border-transparent'
+                mode === m ? 'text-ink border-ink' : 'text-ink-faint border-transparent'
               }`}
             >
               {m === 'login' ? t('loginTab') : t('registerTab')}
@@ -60,6 +73,21 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {mode === 'register' && (
+            <div className="flex flex-col gap-1">
+              <label className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
+                {t('displayNameLabel')}
+              </label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                required
+                className="border-b border-border pb-2 text-base bg-transparent outline-none focus:border-ink transition-colors"
+              />
+            </div>
+          )}
+
           <div className="flex flex-col gap-1">
             <label className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
               {t('emailLabel')}
@@ -87,9 +115,7 @@ export default function Login() {
             />
           </div>
 
-          {error && (
-            <p className="text-[11px] text-red-500">{error}</p>
-          )}
+          {error && <p className="text-[11px] text-red-500">{error}</p>}
 
           <button
             type="submit"

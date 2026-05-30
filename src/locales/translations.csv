@@ -41,3 +41,8 @@ darkMode|Oscuro|Dark
 accountSection|Cuenta|Account
 emailFieldLabel|Correo|Email
 languageSection|Idioma|Language
+signOutButton|Cerrar Sesión|Sign Out
+displayNameLabel|Nombre en partida|Display name
+saveButton|Guardar|Save
+savedFeedback|¡Guardado!|Saved!
+saveError|Error al guardar|Error saving
