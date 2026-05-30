@@ -71,9 +71,9 @@ function RoomList({ rooms, label, emptyText }: { rooms: Room[]; label: string; e
         <ul className="flex flex-col gap-3">
           {rooms.map((room) => (
             <li key={room.id}>
-              <button
+              <div
                 onClick={() => navigate(`/room/${room.id}`)}
-                className="w-full bg-surface-2 rounded-xl p-4 text-left flex items-center justify-between"
+                className="w-full bg-surface-2 rounded-xl p-4 text-left flex items-center justify-between cursor-pointer"
               >
                 <div>
                   <p className="font-semibold text-sm">{room.name}</p>
@@ -82,7 +82,7 @@ function RoomList({ rooms, label, emptyText }: { rooms: Room[]; label: string; e
                   )}
                 </div>
                 <CopyCodeButton code={room.code} />
-              </button>
+              </div>
             </li>
           ))}
         </ul>
