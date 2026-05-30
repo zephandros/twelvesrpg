@@ -75,7 +75,7 @@ export default function JoinRoom() {
         <button
           type="submit"
           disabled={loading || code.length < 6}
-          className="mt-2 py-3 bg-ink text-white text-xs font-semibold tracking-[0.06em] uppercase rounded-xl disabled:opacity-50"
+          className="mt-2 py-3 bg-accent text-surface text-xs font-semibold tracking-[0.06em] uppercase rounded-xl disabled:opacity-50"
         >
           {loading ? '...' : 'Unirse'}
         </button>

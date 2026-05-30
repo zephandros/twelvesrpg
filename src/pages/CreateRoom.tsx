@@ -98,7 +98,7 @@ export default function CreateRoom() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 py-3 bg-ink text-white text-xs font-semibold tracking-[0.06em] uppercase rounded-xl disabled:opacity-50"
+          className="mt-2 py-3 bg-accent text-surface text-xs font-semibold tracking-[0.06em] uppercase rounded-xl disabled:opacity-50"
         >
           {loading ? '...' : 'Crear sala'}
         </button>

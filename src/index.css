@@ -7,7 +7,139 @@
   --color-surface: #ffffff;
   --color-surface-2: #f5f5f3;
   --color-border: #dddddd;
+  --color-accent: #111111;
   --font-family-sans: 'Lexend', sans-serif;
+}
+
+/* ─── Transición global de colores ─── */
+*, *::before, *::after {
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease,
+    border-color 0.4s ease,
+    fill 0.4s ease,
+    stroke 0.4s ease;
+}
+
+/* ─── DEFAULT DARK ─── */
+[data-mode="dark"] {
+  --color-ink: #f0f0ee;
+  --color-ink-light: #aaaaaa;
+  --color-ink-faint: #555555;
+  --color-surface: #111111;
+  --color-surface-2: #1e1e1e;
+  --color-border: #333333;
+  --color-accent: #f0f0ee;
+}
+
+/* ─── SUNSET LIGHT ─── */
+[data-ambiance="sunset"] {
+  --color-ink: #1a0a00;
+  --color-ink-light: #8b3a0f;
+  --color-ink-faint: #c47240;
+  --color-surface: #fff8f3;
+  --color-surface-2: #ffeedd;
+  --color-border: #f4c9a8;
+  --color-accent: #e05c10;
+}
+
+/* ─── SUNSET DARK ─── */
+[data-mode="dark"][data-ambiance="sunset"] {
+  --color-ink: #ffd4a8;
+  --color-ink-light: #e8945a;
+  --color-ink-faint: #b05c2a;
+  --color-surface: #0d0a1a;
+  --color-surface-2: #1a1225;
+  --color-border: #2d1f3d;
+  --color-accent: #f07030;
+}
+
+/* ─── MORNING LIGHT ─── */
+[data-ambiance="morning"] {
+  --color-ink: #1a1400;
+  --color-ink-light: #856c00;
+  --color-ink-faint: #c4a800;
+  --color-surface: #fffef5;
+  --color-surface-2: #fffce0;
+  --color-border: #f0e890;
+  --color-accent: #c49000;
+}
+
+/* ─── MORNING DARK ─── */
+[data-mode="dark"][data-ambiance="morning"] {
+  --color-ink: #fff3a0;
+  --color-ink-light: #d4b800;
+  --color-ink-faint: #8a7800;
+  --color-surface: #0f0f00;
+  --color-surface-2: #1a1a00;
+  --color-border: #333300;
+  --color-accent: #d4b000;
+}
+
+/* ─── NIGHT LIGHT ─── */
+[data-ambiance="night"] {
+  --color-ink: #0a0015;
+  --color-ink-light: #4a2080;
+  --color-ink-faint: #8060b0;
+  --color-surface: #f8f5ff;
+  --color-surface-2: #ede5ff;
+  --color-border: #c8b0e8;
+  --color-accent: #6030c0;
+}
+
+/* ─── NIGHT DARK ─── */
+[data-mode="dark"][data-ambiance="night"] {
+  --color-ink: #d4c0ff;
+  --color-ink-light: #9070d0;
+  --color-ink-faint: #5040a0;
+  --color-surface: #05010f;
+  --color-surface-2: #0f0825;
+  --color-border: #1e1040;
+  --color-accent: #8050e0;
+}
+
+/* ─── NEON LIGHT ─── */
+[data-ambiance="neon"] {
+  --color-ink: #001020;
+  --color-ink-light: #0050b0;
+  --color-ink-faint: #4080e0;
+  --color-surface: #f0f8ff;
+  --color-surface-2: #e0f0ff;
+  --color-border: #90c0ff;
+  --color-accent: #0060e0;
+}
+
+/* ─── NEON DARK ─── */
+[data-mode="dark"][data-ambiance="neon"] {
+  --color-ink: #00e8ff;
+  --color-ink-light: #ff00aa;
+  --color-ink-faint: #0080aa;
+  --color-surface: #020408;
+  --color-surface-2: #060c14;
+  --color-border: #0a1e30;
+  --color-accent: #ff00aa;
+}
+
+/* ─── PHOSPHOR LIGHT ─── */
+[data-ambiance="phosphor"] {
+  --color-ink: #001a00;
+  --color-ink-light: #006600;
+  --color-ink-faint: #009900;
+  --color-surface: #f0fff0;
+  --color-surface-2: #e0ffe0;
+  --color-border: #90d890;
+  --color-accent: #007700;
+}
+
+/* ─── PHOSPHOR DARK ─── */
+[data-mode="dark"][data-ambiance="phosphor"] {
+  --color-ink: #00ff41;
+  --color-ink-light: #00cc33;
+  --color-ink-faint: #008822;
+  --color-surface: #000500;
+  --color-surface-2: #001200;
+  --color-border: #003300;
+  --color-accent: #00cc33;
 }
 
 @layer base {
