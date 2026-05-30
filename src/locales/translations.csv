@@ -1,0 +1,43 @@
+key|es|en
+appName|TWELVES|TWELVES
+appSubtitle|Sistema de rol|Role-playing system
+back|← Volver|← Back
+optional|(opcional)|(optional)
+loading|...|...
+copied|¡Copiado!|Copied!
+copy|Copiar|Copy
+navRooms|Salas|Rooms
+navSettings|Ajustes|Settings
+navSignOut|Salir|Sign out
+loginTab|Iniciar sesión|Sign in
+registerTab|Registrarse|Register
+emailLabel|Correo electrónico|Email
+passwordLabel|Contraseña|Password
+signInButton|Entrar|Enter
+registerButton|Crear cuenta|Create account
+createButton|Crear|Create
+joinButton|Unirse|Join
+myRooms|Mis salas|My rooms
+noMyRooms|No has creado ninguna sala.|You haven't created any rooms.
+joinedRooms|Salas unidas|Joined rooms
+noJoinedRooms|No te has unido a ninguna sala.|You haven't joined any rooms.
+newRoomTitle|Nueva sala|New room
+roomNameLabel|Nombre|Name
+roomDescLabel|Descripción|Description
+maxPlayersLabel|Máx. jugadores|Max. players
+createRoomButton|Crear sala|Create room
+createRoomError|Error al crear la sala|Error creating room
+joinRoomTitle|Unirse a una sala|Join a room
+roomCodeLabel|Código de sala|Room code
+roomCodePlaceholder|XXXXXX|XXXXXX
+joinRoomButton|Unirse|Join
+invalidCodeError|Código inválido. Verifica e intenta de nuevo.|Invalid code. Please check and try again.
+joinRoomError|Error al unirse a la sala|Error joining room
+roomLabel|Sala|Room
+roomPlaceholder|Vista de sala — Fase 2|Room view — Phase 2
+appearanceSection|Apariencia|Appearance
+lightMode|Claro|Light
+darkMode|Oscuro|Dark
+accountSection|Cuenta|Account
+emailFieldLabel|Correo|Email
+languageSection|Idioma|Language

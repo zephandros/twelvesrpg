@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
+import { useLocale } from '@/contexts/LocaleContext'
 
 function generateCode(length = 6): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -11,6 +12,7 @@ function generateCode(length = 6): string {
 
 export default function CreateRoom() {
   const { user } = useAuth()
+  const { t } = useLocale()
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -35,28 +37,25 @@ export default function CreateRoom() {
       })
       navigate(`/room/${doc.id}`)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error al crear la sala')
+      setError(err instanceof Error ? err.message : t('createRoomError'))
       setLoading(false)
     }
   }
 
   return (
     <div className="px-5 py-6 max-w-sm mx-auto">
-      <button
-        onClick={() => navigate(-1)}
-        className="text-xs text-ink-faint mb-6 block"
-      >
-        ← Volver
+      <button onClick={() => navigate(-1)} className="text-xs text-ink-faint mb-6 block">
+        {t('back')}
       </button>
 
       <h2 className="text-[9px] font-semibold tracking-[0.16em] uppercase text-ink-faint mb-6">
-        Nueva sala
+        {t('newRoomTitle')}
       </h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div className="flex flex-col gap-1">
           <label className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
-            Nombre
+            {t('roomNameLabel')}
           </label>
           <input
             type="text"
@@ -69,7 +68,8 @@ export default function CreateRoom() {
 
         <div className="flex flex-col gap-1">
           <label className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
-            Descripción <span className="font-light normal-case tracking-normal">(opcional)</span>
+            {t('roomDescLabel')}{' '}
+            <span className="font-light normal-case tracking-normal">{t('optional')}</span>
           </label>
           <input
             type="text"
@@ -81,7 +81,8 @@ export default function CreateRoom() {
 
         <div className="flex flex-col gap-1">
           <label className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
-            Máx. jugadores <span className="font-light normal-case tracking-normal">(opcional)</span>
+            {t('maxPlayersLabel')}{' '}
+            <span className="font-light normal-case tracking-normal">{t('optional')}</span>
           </label>
           <input
             type="number"
@@ -100,7 +101,7 @@ export default function CreateRoom() {
           disabled={loading}
           className="mt-2 py-3 bg-accent text-surface text-xs font-semibold tracking-[0.06em] uppercase rounded-xl disabled:opacity-50"
         >
-          {loading ? '...' : 'Crear sala'}
+          {loading ? t('loading') : t('createRoomButton')}
         </button>
       </form>
     </div>

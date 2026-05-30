@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
+import { useLocale } from '@/contexts/LocaleContext'
 
 interface Room {
   id: string
@@ -34,6 +35,7 @@ function fromDoc(id: string, data: DocumentData): Room {
 }
 
 function CopyCodeButton({ code }: { code: string }) {
+  const { t } = useLocale()
   const [copied, setCopied] = useState(false)
 
   function handleClick(e: React.MouseEvent) {
@@ -48,7 +50,7 @@ function CopyCodeButton({ code }: { code: string }) {
     <button onClick={handleClick} className="flex flex-col items-end gap-0.5 shrink-0">
       <span className="text-[10px] font-mono text-ink-faint tracking-widest">{code}</span>
       <span className="text-[8px] tracking-wide uppercase text-ink-faint opacity-60">
-        {copied ? '¡Copiado!' : 'Copiar'}
+        {copied ? t('copied') : t('copy')}
       </span>
     </button>
   )
@@ -89,6 +91,7 @@ function RoomList({ rooms, label, emptyText }: { rooms: Room[]; label: string; e
 
 export default function Home() {
   const { user } = useAuth()
+  const { t } = useLocale()
   const navigate = useNavigate()
   const [rooms, setRooms] = useState<Room[]>([])
 
@@ -118,28 +121,19 @@ export default function Home() {
             onClick={() => navigate('/room/join')}
             className="px-4 py-2 border border-border rounded-xl text-xs font-medium text-ink-light"
           >
-            Unirse
+            {t('joinButton')}
           </button>
           <button
             onClick={() => navigate('/room/new')}
             className="px-4 py-2 bg-accent text-surface rounded-xl text-xs font-semibold tracking-wide uppercase"
           >
-            Crear
+            {t('createButton')}
           </button>
         </div>
       </div>
 
-      <RoomList
-        rooms={myRooms}
-        label="Mis salas"
-        emptyText="No has creado ninguna sala."
-      />
-
-      <RoomList
-        rooms={joinedRooms}
-        label="Salas unidas"
-        emptyText="No te has unido a ninguna sala."
-      />
+      <RoomList rooms={myRooms} label={t('myRooms')} emptyText={t('noMyRooms')} />
+      <RoomList rooms={joinedRooms} label={t('joinedRooms')} emptyText={t('noJoinedRooms')} />
     </div>
   )
 }

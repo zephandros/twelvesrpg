@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { LocaleProvider } from '@/contexts/LocaleContext'
 import { useAuth } from '@/hooks/useAuth'
 import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
@@ -20,6 +21,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <ThemeProvider>
+    <LocaleProvider>
     <BrowserRouter>
       <Routes>
         <Route
@@ -45,6 +47,7 @@ export default function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </LocaleProvider>
   </ThemeProvider>
   )
 }

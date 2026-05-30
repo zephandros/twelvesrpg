@@ -4,10 +4,12 @@ import {
   createUserWithEmailAndPassword,
 } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+import { useLocale } from '@/contexts/LocaleContext'
 
 type Mode = 'login' | 'register'
 
 export default function Login() {
+  const { t } = useLocale()
   const [mode, setMode] = useState<Mode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -36,9 +38,9 @@ export default function Login() {
       <div className="w-full max-w-sm">
         <div className="mb-8">
           <p className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint mb-1">
-            Sistema de rol
+            {t('appSubtitle')}
           </p>
-          <h1 className="text-3xl font-bold tracking-tight">TWELVES</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('appName')}</h1>
         </div>
 
         <div className="flex border-b border-border mb-6">
@@ -52,7 +54,7 @@ export default function Login() {
                   : 'text-ink-faint border-transparent'
               }`}
             >
-              {m === 'login' ? 'Iniciar sesión' : 'Registrarse'}
+              {m === 'login' ? t('loginTab') : t('registerTab')}
             </button>
           ))}
         </div>
@@ -60,7 +62,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
             <label className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
-              Correo electrónico
+              {t('emailLabel')}
             </label>
             <input
               type="email"
@@ -73,7 +75,7 @@ export default function Login() {
 
           <div className="flex flex-col gap-1">
             <label className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
-              Contraseña
+              {t('passwordLabel')}
             </label>
             <input
               type="password"
@@ -94,7 +96,7 @@ export default function Login() {
             disabled={loading}
             className="mt-2 py-3 bg-accent text-surface text-xs font-semibold tracking-[0.06em] uppercase rounded-xl disabled:opacity-50 transition-opacity"
           >
-            {loading ? '...' : mode === 'login' ? 'Entrar' : 'Crear cuenta'}
+            {loading ? t('loading') : mode === 'login' ? t('signInButton') : t('registerButton')}
           </button>
         </form>
       </div>

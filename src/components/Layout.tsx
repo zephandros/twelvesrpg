@@ -2,27 +2,28 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useAuth } from '@/hooks/useAuth'
+import { useLocale } from '@/contexts/LocaleContext'
 
 export default function Layout() {
   const { user } = useAuth()
+  const { t } = useLocale()
 
   return (
     <div className="min-h-screen flex flex-col bg-surface">
-      {/* Shell centrado con ancho máximo */}
       <div className="w-full max-w-4xl mx-auto flex flex-col flex-1 min-h-screen border-x border-border">
         <header className="border-b border-border px-5 py-3 flex items-center justify-between">
           <div>
             <p className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
-              Sistema de rol
+              {t('appSubtitle')}
             </p>
-            <p className="text-xl font-bold tracking-tight">TWELVES</p>
+            <p className="text-xl font-bold tracking-tight">{t('appName')}</p>
           </div>
           {user && (
             <button
               onClick={() => signOut(auth)}
               className="text-xs text-ink-faint hover:text-ink transition-colors"
             >
-              Salir
+              {t('navSignOut')}
             </button>
           )}
         </header>
@@ -41,7 +42,7 @@ export default function Layout() {
               }`
             }
           >
-            Salas
+            {t('navRooms')}
           </NavLink>
           <NavLink
             to="/settings"
@@ -51,7 +52,7 @@ export default function Layout() {
               }`
             }
           >
-            Ajustes
+            {t('navSettings')}
           </NavLink>
         </nav>
       </div>
