@@ -43,7 +43,7 @@ export default function CreateRoom() {
   }
 
   return (
-    <div className="px-5 py-6 max-w-sm mx-auto">
+    <div className="px-5 py-6 max-w-lg mx-auto">
       <button onClick={() => navigate(-1)} className="text-xs text-ink-faint mb-6 block">
         {t('back')}
       </button>

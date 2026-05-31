@@ -8,7 +8,7 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-surface">
-      <div className="w-full max-w-4xl mx-auto flex flex-col flex-1 min-h-screen border-x border-border">
+      <div className="w-full flex flex-col flex-1 min-h-screen border-x border-border">
         <header className="border-b border-border px-5 py-3 flex items-center justify-between">
           <div>
             <p className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">

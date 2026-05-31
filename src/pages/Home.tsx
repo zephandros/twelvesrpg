@@ -121,7 +121,7 @@ export default function Home() {
   const joinedRooms = rooms.filter((r) => r.hostId !== user?.uid)
 
   return (
-    <div className="px-5 py-6 flex flex-col gap-8">
+    <div className="px-5 py-6 max-w-lg mx-auto flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <span />
         <div className="flex gap-2">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signOut, updateProfile } from 'firebase/auth'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
@@ -9,6 +9,7 @@ import { useLocale } from '@/contexts/LocaleContext'
 import { localeLabels } from '@/locales'
 import { getFirebaseErrorKey } from '@/lib/firebaseError'
 import { notify } from '@/lib/notify'
+import { Pencil, X, Check } from 'lucide-react'
 
 const MODES: Mode[] = ['light', 'dark']
 
@@ -20,8 +21,9 @@ export default function Settings() {
 
   const [displayName, setDisplayName] = useState('')
   const [initialName, setInitialName] = useState('')
+  const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const nameInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!user) return
@@ -45,8 +47,8 @@ export default function Settings() {
       )
       await updateProfile(user, { displayName })
       setInitialName(displayName)
-      setSaved(true)
-      setTimeout(() => setSaved(false), 1500)
+      setEditing(false)
+      notify(t('savedFeedback'), 'success')
     } catch (err: unknown) {
       notify(t(getFirebaseErrorKey(err)))
     } finally {
@@ -54,15 +56,18 @@ export default function Settings() {
     }
   }
 
+  function handleCancel() {
+    setDisplayName(initialName)
+    setEditing(false)
+  }
+
   async function handleSignOut() {
     await signOut(auth)
     navigate('/login', { replace: true })
   }
 
-  const hasChanges = displayName !== initialName
-
   return (
-    <div className="px-5 py-6 flex flex-col gap-8">
+    <div className="px-5 py-6 max-w-lg mx-auto flex flex-col gap-8">
       <button onClick={() => navigate(-1)} className="text-xs text-ink-faint self-start">
         {t('back')}
       </button>
@@ -117,23 +122,45 @@ export default function Settings() {
           <label className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
             {t('displayNameLabel')}
           </label>
-          <input
-            type="text"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            className="border-b border-border pb-2 text-base bg-transparent outline-none focus:border-ink transition-colors"
-          />
+          <div className="flex items-center gap-2 border-b border-border pb-2">
+            <input
+              ref={nameInputRef}
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              readOnly={!editing}
+              className="flex-1 text-base bg-transparent outline-none transition-colors"
+            />
+            {!editing ? (
+              <button
+                onClick={() => { setEditing(true); setTimeout(() => nameInputRef.current?.focus(), 0) }}
+                className="pr-1 text-ink-faint hover:text-ink transition-colors"
+                aria-label="Editar nombre"
+              >
+                <Pencil size={15} />
+              </button>
+            ) : (
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCancel}
+                  disabled={saving}
+                  className="text-ink-faint hover:text-ink transition-colors disabled:opacity-40"
+                  aria-label="Cancelar"
+                >
+                  <X size={15} />
+                </button>
+                <button
+                  onClick={handleSaveName}
+                  disabled={saving}
+                  className="text-ink hover:text-accent transition-colors disabled:opacity-40"
+                  aria-label="Guardar"
+                >
+                  <Check size={15} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-
-        {hasChanges && (
-          <button
-            onClick={handleSaveName}
-            disabled={saving}
-            className="self-start py-2 px-5 bg-accent text-surface text-xs font-semibold tracking-[0.06em] uppercase rounded-xl disabled:opacity-50"
-          >
-            {saving ? t('loading') : saved ? t('savedFeedback') : t('saveButton')}
-          </button>
-        )}
 
         <div className="flex flex-col gap-1">
           <p className="text-[9px] font-semibold tracking-[0.14em] uppercase text-ink-faint">
