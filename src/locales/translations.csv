@@ -57,4 +57,5 @@ firebaseUserDisabled|Esta cuenta ha sido desactivada|This account has been disab
 firebasePermissionDenied|No tienes permiso para realizar esta acción|You don't have permission to perform this action
 firebaseUnavailable|Servicio no disponible. Verifica tu conexión.|Service unavailable. Check your connection.
 firebaseNotFound|El recurso solicitado no existe|The requested resource does not exist
+firebaseInvalidCredential|Correo o contraseña incorrectos|Incorrect email or password
 firebaseUnknown|Ocurrió un error inesperado|An unexpected error occurred

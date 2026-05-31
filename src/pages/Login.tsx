@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -19,10 +19,20 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [failedAttempts, setFailedAttempts] = useState(0)
+  const [cooldown, setCooldown] = useState(0)
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const id = setInterval(() => setCooldown((c) => c - 1), 1000)
+    return () => clearInterval(id)
+  }, [cooldown])
 
   function switchMode(m: Mode) {
     setMode(m)
     setDisplayName('')
+    setFailedAttempts(0)
+    setCooldown(0)
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -42,6 +52,9 @@ export default function Login() {
       }
     } catch (err: unknown) {
       notify(t(getFirebaseErrorKey(err)))
+      const next = failedAttempts + 1
+      setFailedAttempts(next)
+      setCooldown(Math.min(next * 3, 30))
     } finally {
       setLoading(false)
     }
@@ -116,10 +129,14 @@ export default function Login() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || cooldown > 0}
             className="mt-2 py-3 bg-accent text-surface text-xs font-semibold tracking-[0.06em] uppercase rounded-xl disabled:opacity-50 transition-opacity"
           >
-            {loading ? t('loading') : mode === 'login' ? t('signInButton') : t('registerButton')}
+            {cooldown > 0
+              ? `${cooldown}s…`
+              : loading
+                ? t('loading')
+                : mode === 'login' ? t('signInButton') : t('registerButton')}
           </button>
         </form>
       </div>
