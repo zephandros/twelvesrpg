@@ -1,6 +1,7 @@
 import { Outlet, useNavigate } from 'react-router-dom'
 import { Settings as SettingsIcon } from 'lucide-react'
 import { useLocale } from '@/contexts/LocaleContext'
+import DiceScene from '@/babylon/DiceScene'
 
 export default function Layout() {
   const { t } = useLocale()
@@ -29,6 +30,7 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+      <DiceScene />
     </div>
   )
 }

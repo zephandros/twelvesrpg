@@ -59,3 +59,7 @@ firebaseUnavailable|Servicio no disponible. Verifica tu conexión.|Service unava
 firebaseNotFound|El recurso solicitado no existe|The requested resource does not exist
 firebaseInvalidCredential|Correo o contraseña incorrectos|Incorrect email or password
 firebaseUnknown|Ocurrió un error inesperado|An unexpected error occurred
+rollButton|Lanzar dados|Roll dice
+rolling|Lanzando...|Rolling...
+rollResult|Resultado|Result
+rollHistory|Tiradas recientes|Recent rolls

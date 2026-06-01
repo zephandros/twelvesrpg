@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { LocaleProvider } from '@/contexts/LocaleContext'
+import { DiceProvider } from '@/contexts/DiceContext'
 import { useAuth } from '@/hooks/useAuth'
 import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
@@ -23,6 +24,7 @@ export default function App() {
   return (
     <ThemeProvider>
     <LocaleProvider>
+    <DiceProvider>
     <BrowserRouter>
       <Routes>
         <Route
@@ -49,6 +51,7 @@ export default function App() {
       </Routes>
     </BrowserRouter>
     <Toaster position="bottom-center" richColors />
+    </DiceProvider>
     </LocaleProvider>
   </ThemeProvider>
   )
