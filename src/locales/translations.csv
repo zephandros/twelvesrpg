@@ -63,3 +63,144 @@ rollButton|Lanzar dados|Roll dice
 rolling|Lanzando...|Rolling...
 rollResult|Resultado|Result
 rollHistory|Tiradas recientes|Recent rolls
+roleNarrator|Narrador|Narrator
+rolePlayer|Jugador|Player
+onlineWord|en línea|online
+playersWord|jugadores|players
+tabPartida|Partida|Game
+tabPanel|Panel|Panel
+tabPanelDM|Panel DM|DM Panel
+roomNotFound|Sala no encontrada|Room not found
+composerPlayer|Escribe o usa /comando|Type or use /command
+composerNarrator|Narra la escena…|Narrate the scene…
+composerNpcPrefix|Habla como|Speak as
+chipRoll|/tirar|/roll
+chipWhisper|/susurrar|/whisper
+chipAction|Acción|Action
+chipRequest|Pedir tirada|Request roll
+chipImage|Imagen|Image
+chipLoot|Botín|Loot
+chipNpc|Hablar como NPC|Speak as NPC
+speakingAs|Hablando como|Speaking as
+attachAction|Adjuntar imagen o recurso|Attach image or resource
+emptyThread|La partida comienza aquí.|The game starts here.
+emptyThreadSub|Escribe el primer mensaje.|Write the first message.
+rollKind|Tirada|Roll
+freeRoll|Tirada libre|Free roll
+attribute|Atributo|Attribute
+diceTotal|Total|Total
+diceWord|Dados|Dice
+modifierWord|mod|mod
+resultCrit|Crítico|Critical
+resultOk|Éxito|Success
+resultFail|Fallo|Failure
+roleAside|Aparte|Aside
+roleNpc|NPC|NPC
+lootKind|Botín|Loot
+shopKind|Tienda|Shop
+takeAll|Recoger todo|Take all
+takenOk|✓ Recogido|✓ Taken
+buyAction|Comprar|Buy
+closeAction|Cerrar|Close
+lootEmpty|Sin objetos|No items
+expandLabel|Ampliar|Expand
+imageLabel|Imagen|Image
+sharedByNarrator|Compartida por el Narrador|Shared by the Narrator
+fullscreenImage|Imagen a pantalla completa|Full-screen image
+requestKind|Tirada solicitada|Roll requested
+requestBody|El Narrador pide una tirada de|The Narrator requests a roll of
+rollAction|Tirar 2d12|Roll 2d12
+waitingPlayers|Esperando a los jugadores…|Waiting for players…
+requestDone|Tirada resuelta ✓|Roll resolved ✓
+stateCombat|Combate iniciado|Combat started
+stateRol|Modo Rol|Roleplay mode
+stateSequence|Secuencia|Sequence
+btnCombat|Combate|Combat
+btnRol|Rol|Roleplay
+btnSequence|Secuencia|Sequence
+panelYourChar|Tu personaje|Your character
+ptabCharacter|Personaje|Character
+ptabNotes|Notas|Notes
+fieldBloodline|Línea de Sangre|Bloodline
+fieldBackground|Trasfondo|Background
+secAttributes|Atributos|Attributes
+secStatus|Estatus|Status
+secSkills|Habilidades|Skills
+labelHealth|Salud|Health
+labelLuck|Suerte|Luck
+statusHint|Toca para marcar daño o gastar suerte.|Tap to mark damage or spend luck.
+noSkills|Sin habilidades.|No skills.
+btnRollDie|Tirar dado|Roll dice
+notesSection|Notas de sesión|Session notes
+noNotes|Aún no tienes notas.|You have no notes yet.
+newNotePlaceholder|Escribe una nota nueva…|Write a new note…
+addNote|Añadir nota|Add note
+panelNarrator|Panel del Narrador|Narrator panel
+panelControl|Control|Control
+ntabEvents|Eventos|Events
+ntabNpcs|NPCs|NPCs
+ntabResources|Recursos|Resources
+ntabPlayers|Jugadores|Players
+ntabDice|Dados|Dice
+secLaunchEvent|Lanzar evento|Launch event
+actRequestT|Pedir tirada|Request roll
+actRequestD|Solicita 2d12 + atributo|Requests 2d12 + attribute
+actImageT|Mostrar imagen|Show image
+actImageD|Lightbox a toda la sala|Lightbox to the whole room
+actLootT|Abrir inventario|Open inventory
+actLootD|Botín o saqueo|Loot or spoils
+actShopT|Abrir tienda|Open shop
+actShopD|Mercader con precios|Merchant with prices
+secGameState|Estado de la partida|Game state
+secNpcs|NPCs e interpretación|NPCs & roleplay
+secEnemies|Enemigos|Enemies
+btnInterpret|Interpretar|Play
+btnAttack|Atacar|Attack
+createNpc|Crear NPC|Create NPC
+npcEmpty|Sin NPCs todavía.|No NPCs yet.
+enemyEmpty|Sin enemigos.|No enemies.
+secResources|Recursos · mapas e imágenes|Resources · maps & images
+resourcesHint|Toca un recurso para mostrarlo en la Partida.|Tap a resource to show it in the Game.
+uploadResource|Subir recurso|Upload resource
+resourcesEmpty|Sin recursos.|No resources.
+viewSheet|Ver hoja|View sheet
+playersEmpty|Aún no hay jugadores.|No players yet.
+secQuickRoll|Tirada rápida|Quick roll
+secretRoll|Tirar en secreto|Secret roll
+formName|Nombre|Name
+formDescription|Descripción|Description
+formTitle|Título|Title
+formCaption|Texto|Caption
+formImageUrl|URL de imagen (opcional)|Image URL (optional)
+formItems|Objetos (uno por línea)|Items (one per line)
+formItemsHintLoot|Ej: Llave oxidada x1|E.g.: Rusty key x1
+formItemsHintShop|Ej: Daga rúnica 24|E.g.: Runic dagger 24
+formKindNpc|NPC|NPC
+formKindEnemy|Enemigo|Enemy
+formAdd|Añadir|Add
+formCancel|Cancelar|Cancel
+lootDefaultTitle|Botín|Loot
+shopDefaultTitle|Tienda|Shop
+toastRollRequested|Tirada solicitada|Roll requested
+toastImageShown|Imagen mostrada a la sala|Image shown to the room
+toastLootOpened|Botín abierto|Loot opened
+toastShopOpened|Tienda abierta|Shop opened
+toastObjectsTaken|Objetos recogidos|Objects taken
+toastDieRolled|Dado lanzado|Dice rolled
+toastSecretRoll|Tirada en secreto realizada|Secret roll made
+toastNpcCreated|NPC creado|NPC created
+toastResourceAdded|Recurso añadido|Resource added
+toastSheetSoon|Ver hojas de otros jugadores próximamente|Viewing other players' sheets coming soon
+toastNeedResource|Sube un recurso para compartir una imagen|Upload a resource to share an image
+cmdUnknown|Comando no reconocido|Unknown command
+cmdRollInvalid|Modificador inválido — prueba /tirar +3|Invalid modifier — try /roll +3
+cmdWhisperEmpty|Escribe el mensaje a susurrar|Type the message to whisper
+cmdAsideEmpty|Escribe tu mensaje fuera de personaje|Type your out-of-character message
+today|Hoy|Today
+noCharacter|No tienes un personaje|You don't have a character
+createCharacter|Crear personaje|Create character
+editAction|Editar|Edit
+fieldName|Nombre|Name
+labelStress|Estrés|Stress
+secTalents|Talentos|Talents
+noTalents|Sin talentos.|No talents.

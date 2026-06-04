@@ -1,0 +1,217 @@
+/* ============================================================
+   sala-app.css — capa interactiva del prototipo
+   (se carga DESPUÉS de room.css)
+   ============================================================ */
+
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: var(--font);
+  background:
+    radial-gradient(120% 80% at 50% -10%, #fbfbf9 0%, #efefec 60%, #e7e7e3 100%);
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100dvh; overflow: hidden;
+}
+
+/* ---- escenario / dispositivo ---- */
+.sala-stage {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  height: 100dvh; justify-content: center; padding: 18px;
+}
+.sala-stage .tw-phone {
+  height: min(796px, calc(100dvh - 104px));
+  box-shadow: 0 40px 90px -40px rgba(20,18,16,.45), 0 8px 24px -12px rgba(0,0,0,.2);
+}
+
+/* ---- selector de rol (fuera del dispositivo) ---- */
+.sala-roleswitch {
+  display: flex; align-items: center; gap: 4px;
+  background: #fff; border: 1px solid var(--border-2); border-radius: 999px;
+  padding: 4px; box-shadow: 0 6px 18px -10px rgba(0,0,0,.25);
+}
+.sala-roleswitch .lbl {
+  font: 600 9px var(--font); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-faint); padding: 0 10px 0 12px;
+}
+.sala-role {
+  font: 600 11px var(--font); letter-spacing: .03em; padding: 7px 15px;
+  border-radius: 999px; color: var(--ink-2); cursor: pointer; border: none; background: none;
+  transition: all .15s; display: flex; align-items: center; gap: 6px;
+}
+.sala-role svg { width: 13px; height: 13px; }
+.sala-role.active { background: var(--ink); color: #fff; }
+
+/* ---- transiciones de vista ---- */
+/* los hijos del hilo NUNCA deben encogerse (las event-cards con overflow:hidden
+   colapsan a ~0px si flex-shrink>0 cuando el chat desborda) */
+.tw-thread > *, .tw-d-thread > * { flex-shrink: 0; }
+@keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes panelIn { from { opacity: 0; } to { opacity: 1; } }
+/* estado visible = base (opacidad 1); animamos solo la entrada si se permite movimiento */
+@media (prefers-reduced-motion: no-preference) {
+  .tw-thread > * { animation: msgIn .26s ease both; }
+  .tw-panel, .tw-thread { animation: panelIn .2s ease; }
+}
+
+/* ---- estados interactivos generales ---- */
+.tw-iconbtn, .tw-plus, .tw-send, .tw-chip, .tw-btn, .tw-seg,
+.tw-ptab, .tw-toptab, .tw-action, .tw-res, .tw-cmditem, .tw-loot-item,
+.sala-role, .tw-acc-head { transition: background .15s, color .15s, border-color .15s, transform .1s, box-shadow .15s; }
+.tw-iconbtn:hover { background: var(--surface-2); }
+.tw-iconbtn:active, .tw-plus:active, .tw-send:active, .tw-btn:active,
+.tw-seg:active, .tw-action:active, .sala-role:active { transform: scale(.95); }
+.tw-chip:hover { border-color: var(--ink); color: var(--ink); }
+.tw-chip.cmd:hover { border-color: var(--accent); }
+.tw-btn:hover { border-color: var(--ink); color: var(--ink); }
+.tw-btn.dark:hover { background: #000; border-color: #000; color: #fff; }
+.tw-seg:not(.active):hover { background: var(--surface-2); }
+.tw-ptab:not(.active):hover { background: var(--surface-2); color: var(--ink-2); }
+.tw-action:hover { border-color: var(--ink); box-shadow: 0 6px 18px -12px rgba(0,0,0,.3); }
+.tw-cmditem:hover, .tw-loot-item:hover { background: var(--surface-2); }
+.tw-res:not(.add):hover { box-shadow: 0 6px 16px -10px rgba(0,0,0,.35); }
+.tw-res.add:hover { border-color: var(--ink); color: var(--ink); }
+.tw-imgframe:hover { filter: brightness(.97); }
+.tw-acc-head:hover { background: var(--surface-2); }
+button { font-family: var(--font); }
+.tw-iconbtn, .tw-plus, .tw-send, .tw-seg, .tw-ptab, .tw-toptab,
+.tw-chip, .tw-action, .tw-res, .tw-loot-item, .tw-acc-head,
+.tw-imgframe, .tw-cmditem, .tw-list-row .tw-btn { cursor: pointer; }
+
+/* ---- input real ---- */
+.tw-input {
+  flex: 1; height: 40px; border-radius: 13px; background: var(--surface-2);
+  border: 1px solid var(--border); padding: 0 14px;
+  font: 400 13.5px var(--font); color: var(--ink); outline: none; min-width: 0;
+  transition: border-color .15s, background .15s;
+}
+.tw-input::placeholder { color: var(--ink-faint); }
+.tw-input:focus { border-color: var(--ink); background: #fff; }
+.tw-input.iscmd { color: var(--accent); font-weight: 500; }
+.tw-send.off { background: var(--surface-3); color: var(--ink-ghost); pointer-events: none; }
+
+/* nota editable */
+.tw-note-input {
+  width: 100%; border: 1px dashed var(--border-2); border-radius: 12px;
+  padding: 13px 15px; font: 400 13px var(--font); color: var(--ink);
+  outline: none; resize: none; background: #fff; transition: border-color .15s;
+}
+.tw-note-input:focus { border-style: solid; border-color: var(--ink); }
+
+/* banner "hablando como NPC" */
+.sala-speakas {
+  display: flex; align-items: center; gap: 9px; padding: 8px 14px;
+  background: var(--accent-soft); border-top: 1px solid var(--border);
+  font: 500 11.5px var(--font); color: var(--accent);
+}
+.sala-speakas svg { width: 14px; height: 14px; }
+.sala-speakas .x { margin-left: auto; color: var(--accent); display: flex; cursor: pointer; }
+.sala-speakas .x svg { width: 15px; height: 15px; }
+
+/* request de tirada (pedida por el DM) */
+.tw-req-foot { padding: 12px 14px; border-top: 1px solid var(--border); }
+.tw-event.req .tw-event-head svg { color: var(--accent); }
+.tw-req-done { font: 600 11px var(--font); color: var(--ink-faint); text-align: center; padding: 12px; }
+
+/* toggles de personaje */
+.heartt { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--ink); cursor: pointer; transition: background .12s, transform .1s; }
+.heartt.on { background: var(--ink); }
+.heartt:active { transform: scale(.85); }
+.luckt { font-size: 19px; color: var(--accent); cursor: pointer; transition: opacity .12s, transform .1s; user-select: none; }
+.luckt.off { opacity: .22; }
+.luckt:active { transform: scale(.85); }
+
+/* lightbox animación */
+@keyframes lbIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lbImg { from { transform: scale(.96); opacity: .6; } to { transform: none; opacity: 1; } }
+.tw-lightbox { animation: lbIn .18s ease; }
+.tw-lightbox .tw-lb-img { animation: lbImg .26s cubic-bezier(.2,.8,.3,1); }
+.tw-lb-close { cursor: pointer; }
+.tw-drawer { animation: drawerIn .24s cubic-bezier(.2,.8,.3,1); }
+@keyframes drawerIn { from { transform: translateX(100%); } to { transform: none; } }
+.tw-drawer-scrim { animation: lbIn .18s ease; }
+
+/* toast */
+.sala-toast {
+  position: absolute; left: 50%; bottom: 86px; transform: translateX(-50%);
+  background: var(--ink); color: #fff; font: 500 12px var(--font);
+  padding: 9px 16px; border-radius: 999px; z-index: 20; white-space: nowrap;
+  box-shadow: 0 12px 28px -12px rgba(0,0,0,.5); animation: toastIn .2s ease;
+  display: flex; align-items: center; gap: 8px;
+}
+.sala-toast svg { width: 14px; height: 14px; }
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+/* die roll animation */
+@keyframes dieRoll { 0% { transform: rotate(-12deg) scale(.8); } 60% { transform: rotate(8deg) scale(1.08); } 100% { transform: none; } }
+.tw-die.rolled { animation: dieRoll .4s cubic-bezier(.2,.9,.3,1.2); }
+
+/* empty hint */
+.sala-empty { text-align: center; color: var(--ink-faint); font: 400 13px var(--font); padding: 40px 20px; }
+
+/* scroll hint shadow on thread top */
+.tw-thread { scroll-behavior: smooth; }
+.tw-d-thread { scroll-behavior: smooth; }
+
+/* ============================================================
+   ESCRITORIO INTERACTIVO — ocupa el viewport
+   ============================================================ */
+.sala-d-stage {
+  width: 100%; height: 100dvh; display: flex; align-items: center; justify-content: center;
+  padding: 22px; box-sizing: border-box;
+}
+.sala-d-stage .tw-desktop {
+  width: 100%; max-width: 1340px; height: 100%; max-height: 880px;
+  box-shadow: 0 40px 100px -50px rgba(20,18,16,.5), 0 8px 24px -14px rgba(0,0,0,.18);
+}
+/* barra superior con selector de rol integrado */
+.sala-d-stage .tw-d-top { gap: 14px; }
+.sala-d-roleswitch { margin-left: auto; display: flex; align-items: center; gap: 4px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
+.sala-d-roleswitch .sala-role { padding: 6px 13px; font-size: 11px; }
+.sala-d-roleswitch .sala-role.active { background: var(--ink); color: #fff; }
+.tw-d-side .tw-panel-body { gap: 18px; }
+.sala-d-stage .tw-lightbox { border-radius: 16px; }
+/* en escritorio el lightbox ocupa solo el frame, con imagen más ancha */
+.sala-d-stage .tw-lb-img { margin: 0 26px; }
+.sala-d-stage .tw-lb-cap { max-width: 680px; margin: 0 auto; }
+.sala-d-stage .sala-toast { bottom: 30px; }
+.tw-d-composer .tw-cmdrow { padding: 0 0 9px; }
+.tw-d-composer .tw-inputbar { padding: 0; }
+
+/* columna de conversación centrada y acotada (chat + composer comparten ancho) */
+.tw-thread-inner {
+  width: 100%; max-width: 720px; margin: 0 auto; flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.tw-thread-inner > * { flex-shrink: 0; }
+.tw-d-composer .tw-thread-inner { gap: 0; }
+/* los eventos compartidos llenan la columna; la imagen, algo más contenida */
+.tw-desktop .tw-event { max-width: 540px; }
+.tw-desktop .tw-imgevent { max-width: 480px; }
+
+/* ---- mensajes propios: alineados a la derecha, en burbuja ---- */
+.tw-msg.mine { flex-direction: row-reverse; }
+.tw-msg.mine .tw-msg-main { display: flex; flex-direction: column; align-items: flex-end; min-width: 0; }
+.tw-msg.mine .tw-msg-body,
+.tw-msg.mine .tw-whisper {
+  background: var(--surface-2); border: 1px solid var(--border);
+  padding: 9px 13px; border-radius: 15px 15px 5px 15px;
+  max-width: 82%; width: fit-content; text-align: left;
+}
+.tw-msg.mine .tw-avatar { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+/* ---- tarjeta de tirada: a la derecha si es del propio jugador, a la izquierda si es de otros ---- */
+.tw-dicecard { max-width: 460px; }
+.tw-dicecard.bleft, .tw-dicecard:not(.mine) { margin-left: 2px; margin-right: auto; }
+.tw-dicecard.mine { margin-left: auto; margin-right: 2px; }
+
+/* pista de redimensionado en pantallas pequeñas */
+.sala-d-small {
+  display: none; position: fixed; inset: 0; z-index: 50; background: var(--surface);
+  align-items: center; justify-content: center; text-align: center; padding: 40px;
+  font: 400 14px/1.6 var(--font); color: var(--ink-2); flex-direction: column; gap: 14px;
+}
+.sala-d-small .tw-wordmark { font-size: 24px; }
+@media (max-width: 720px) {
+  .sala-d-stage { display: none; }
+  .sala-d-small { display: flex; }
+}

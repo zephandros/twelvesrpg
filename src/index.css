@@ -158,3 +158,37 @@
     -webkit-font-smoothing: antialiased;
   }
 }
+
+/* ─── Sala (Room): utilidades y animaciones ─── */
+
+/* scrollbar oculta para hilos y filas de pestañas */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { width: 0; height: 0; }
+
+/* marco rayado para placeholders de imagen/recurso (sin imagen real) */
+.striped {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-surface-2) 0 11px,
+    var(--color-surface) 11px 22px
+  );
+}
+.striped-dark {
+  background: repeating-linear-gradient(45deg, #2a2a2a 0 14px, #232323 14px 28px);
+}
+
+/* entrada de ítems del hilo (solo si se permite movimiento) */
+@keyframes tw-msg-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes tw-die-roll { 0% { transform: rotate(-12deg) scale(.8); } 60% { transform: rotate(8deg) scale(1.08); } 100% { transform: none; } }
+@keyframes tw-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tw-lb-img { from { transform: scale(.96); opacity: .6; } to { transform: none; opacity: 1; } }
+@keyframes tw-toast-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+.anim-die-roll { animation: tw-die-roll .4s cubic-bezier(.2,.9,.3,1.2); }
+.anim-fade-in { animation: tw-fade-in .2s ease; }
+.anim-lb-img { animation: tw-lb-img .26s cubic-bezier(.2,.8,.3,1); }
+.anim-toast-in { animation: tw-toast-in .2s ease; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .anim-msg-in { animation: tw-msg-in .26s ease both; }
+}
