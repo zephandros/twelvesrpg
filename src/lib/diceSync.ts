@@ -33,7 +33,15 @@ export function subscribeToCurrentRoll(
   callback: (event: RollEvent) => void,
 ): () => void {
   const rollRef = ref(rtdb, `sessions/${sessionId}/currentRoll`)
+  // onValue dispara una vez al suscribirse con el valor ya existente. Ignoramos
+  // esa primera emisión para no reproducir el último roll al entrar a la sala;
+  // sólo reaccionamos a rolls que ocurran después de unirse.
+  let initial = true
   const unsub = onValue(rollRef, (snap) => {
+    if (initial) {
+      initial = false
+      return
+    }
     const data = snap.val() as RollEvent | null
     if (data) callback(data)
   })

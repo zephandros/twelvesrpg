@@ -16,7 +16,7 @@ export default function DiceScene() {
   const cancelSimRef = useRef<(() => void) | null>(null)
   const lastRollRef = useRef(useDice().lastRoll)
 
-  const { lastRoll, setSettled, sessionId } = useDice()
+  const { lastRoll, setSettled, sessionId, settled } = useDice()
   const { user } = useAuth()
 
   // Keep lastRoll ref fresh to avoid stale closures in callbacks
@@ -58,6 +58,11 @@ export default function DiceScene() {
             keyframes,
             () => handle.onAnimationEnd?.(),
           )
+        },
+
+        hideDice() {
+          ctx.die1.isVisible = false
+          ctx.die2.isVisible = false
         },
 
         onSimulateComplete: null,
@@ -108,6 +113,17 @@ export default function DiceScene() {
     setSettled(false)
     handle.simulate([roll.values[0], roll.values[1]])
   }, [lastRoll]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Dismiss settled dice on a click/tap anywhere. The canvas has
+  // pointer-events:none so clicks reach the web below; a window listener still
+  // catches them. Only active once the animation has finished (settled becomes
+  // true via onAnimationEnd), so a click never interrupts a running animation.
+  useEffect(() => {
+    if (!settled) return
+    const dismiss = () => handleRef.current?.hideDice()
+    window.addEventListener('pointerdown', dismiss)
+    return () => window.removeEventListener('pointerdown', dismiss)
+  }, [settled])
 
   // Clients: receive currentRoll from Firebase → replay keyframes
   useEffect(() => {

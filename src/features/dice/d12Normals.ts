@@ -96,8 +96,20 @@ export const DODEC_FACE_NORMALS: Vector3[] = UNIT_BASIS.map(b => b.normal)
 // number considers as up, matching the baked UV bitangent. Index i → face i+1.
 export const DODEC_FACE_UP: Vector3[] = UNIT_BASIS.map(b => b.bitangent)
 
-// Distance from die center to a face center (inradius) at the configured size.
-export const D12_INRADIUS = faceBasis(DICE_CONFIG.D12_SIZE)[0].center.length()
+// Inradius (centro→cara) de un dado de tamaño 1. El inradius real escala lineal
+// con el tamaño del dado.
+export const D12_UNIT_INRADIUS = UNIT_BASIS[0].center.length()
+
+// Tamaño del dado (circumradio en unidades de mundo) para un área dada.
+export function dieSize(sWorld: number): number {
+  return sWorld * DICE_CONFIG.D12_SIZE_FACTOR
+}
+
+// Altura de reposo del dado (su inradius) para un área dada, usada para asentarlo
+// plano sobre el suelo.
+export function dieRestY(sWorld: number): number {
+  return D12_UNIT_INRADIUS * dieSize(sWorld)
+}
 
 // ---------------------------------------------------------------------------
 // d12 face numbering (real-die layout)

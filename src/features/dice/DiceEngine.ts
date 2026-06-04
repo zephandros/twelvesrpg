@@ -14,7 +14,7 @@ import {
   VertexData,
 } from '@babylonjs/core'
 import { DICE_CONFIG } from './diceConfig'
-import { faceBasis, FACE_NUMBER } from './d12Normals'
+import { dieSize, faceBasis, FACE_NUMBER } from './d12Normals'
 
 export interface DiceEngineContext {
   engine: Engine
@@ -166,12 +166,10 @@ export async function createDiceEngine(canvas: HTMLCanvasElement): Promise<DiceE
   // exteriores y se vería la cara OPUESTA (el resultado salía invertido).
   dieMat.backFaceCulling = false
 
-  // Meshes — geometry applied once, reused across rolls
-  const dodecVD = buildDodecahedron(DICE_CONFIG.D12_SIZE)
-
+  // Meshes — geometry rebuilt to match the current play-area size so the die
+  // keeps a constant fraction of the screen across resolutions.
   function makeDie(name: string): Mesh {
     const mesh = new Mesh(name, scene)
-    dodecVD.applyToMesh(mesh)
     mesh.material = dieMat
     mesh.isVisible = false
     return mesh
@@ -180,13 +178,24 @@ export async function createDiceEngine(canvas: HTMLCanvasElement): Promise<DiceE
   const die1 = makeDie('die1')
   const die2 = makeDie('die2')
 
+  // (Re)bakes the dodecahedron geometry at size = sWorld * D12_SIZE_FACTOR onto
+  // both dice. Baking real vertex positions (instead of mesh.scaling) keeps the
+  // Havok convex hull exact.
+  function rebuildDice(): void {
+    const vd = buildDodecahedron(dieSize(getSWorld()))
+    vd.applyToMesh(die1)
+    vd.applyToMesh(die2)
+  }
+  rebuildDice()
+
   engine.runRenderLoop(() => scene.render())
 
-  // Update camera on resize
+  // Update camera + die size on resize
   const onResize = () => {
     engine.resize()
     const s = getSWorld()
     camera.setPosition(new Vector3(0, s * DICE_CONFIG.CAMERA_HEIGHT_FACTOR, s * DICE_CONFIG.CAMERA_Z_FACTOR))
+    rebuildDice()
   }
   window.addEventListener('resize', onResize)
 

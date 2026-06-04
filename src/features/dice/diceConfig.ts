@@ -1,6 +1,10 @@
 export const DICE_CONFIG = {
   PIXEL_SCALE: 100,
-  D12_SIZE: 0.5,
+  // Tamaño del dado como FACTOR de sWorld (lado del área de juego), no un valor
+  // fijo. Así el dado ocupa la misma fracción de pantalla en cualquier
+  // resolución (antes era fijo y en móvil se veía enorme). Esta es la perilla
+  // para ajustar el tamaño visual: subir = dados más grandes, bajar = más chicos.
+  D12_SIZE_FACTOR: 0.045,
   SETTLE_THRESHOLD: 0.08,
   SETTLE_FRAMES: 5,
   CORRECTION_DURATION_MS: 250,

@@ -5,7 +5,10 @@ import { pushRoll, subscribeToRolls, type DiceRoll } from '@/lib/diceSync'
 interface DiceContextValue {
   sessionId: string | null
   setSessionId: (id: string | null) => void
-  roll: () => void
+  /** Genera y lanza una tirada de 2×d12. Devuelve los valores generados
+   *  (para que el llamante escriba la tarjeta en el hilo) o null si está
+   *  bloqueada (sin sesión/usuario o en cooldown). */
+  roll: () => [number, number] | null
   isRolling: boolean
   lastRoll: DiceRoll | null
   recentRolls: DiceRoll[]
@@ -49,8 +52,8 @@ export function DiceProvider({ children }: { children: React.ReactNode }) {
     })
   }, [sessionId])
 
-  const roll = useCallback(() => {
-    if (!sessionId || !user || isRolling) return
+  const roll = useCallback((): [number, number] | null => {
+    if (!sessionId || !user || isRolling) return null
 
     const values: [number, number] = [
       Math.ceil(Math.random() * 12),
@@ -66,6 +69,7 @@ export function DiceProvider({ children }: { children: React.ReactNode }) {
     }).catch(console.error)
 
     cooldownRef.current = setTimeout(() => setIsRolling(false), ROLL_COOLDOWN_MS)
+    return values
   }, [sessionId, user, isRolling])
 
   useEffect(() => () => {

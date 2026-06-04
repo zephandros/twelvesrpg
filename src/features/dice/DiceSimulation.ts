@@ -8,7 +8,7 @@ import {
   Vector3,
 } from '@babylonjs/core'
 import { DICE_CONFIG, THROW_CONFIG } from './diceConfig'
-import { computeTargetQ, D12_INRADIUS } from './d12Normals'
+import { computeTargetQ, dieRestY } from './d12Normals'
 import type { DieSimParams, Keyframe, RollResult } from './types'
 
 // ---------------------------------------------------------------------------
@@ -153,6 +153,7 @@ export function runSimulation(
   let completed = false
   const simStart = Date.now()
   let lastKfTime = simStart - DICE_CONFIG.KEYFRAME_INTERVAL_MS
+  const restY = dieRestY(sWorld)   // altura de reposo (inradius) para esta área
 
   const area = createSimArea(scene, sWorld)
 
@@ -225,7 +226,7 @@ export function runSimulation(
         const corrT = Math.min(1, (now - s.correctionStart) / DICE_CONFIG.CORRECTION_DURATION_MS)
         const eased = 1 - Math.pow(1 - corrT, 2)
         meshes[i].rotationQuaternion = Quaternion.Slerp(s.correctionStartQ!, s.correctionTargetQ!, eased)
-        meshes[i].position.y = s.correctionStartY + (D12_INRADIUS - s.correctionStartY) * eased
+        meshes[i].position.y = s.correctionStartY + (restY - s.correctionStartY) * eased
 
         if (corrT >= 1) {
           meshes[i].rotationQuaternion = s.correctionTargetQ!.clone()
