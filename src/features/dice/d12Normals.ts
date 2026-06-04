@@ -134,10 +134,9 @@ export const NUMBER_FACE: number[] = (() => {
 // Face-up orientation
 // ---------------------------------------------------------------------------
 
-// Returns the quaternion that places faceNumber (1-12) pointing toward +Y, with
-// the printed number upright toward the top of the screen (no randomness).
-export function computeTargetQ(faceNumber: number): Quaternion {
-  const fi = NUMBER_FACE[faceNumber]            // geometric face showing this number
+// Returns the quaternion that places geometric face `fi` pointing toward +Y,
+// with that face's printed number upright toward the top of the screen.
+export function computeTargetQForFace(fi: number): Quaternion {
   const localN = DODEC_FACE_NORMALS[fi]
   const up = Vector3.Up()
   const dot = Math.max(-1, Math.min(1, Vector3.Dot(localN, up)))
@@ -163,4 +162,24 @@ export function computeTargetQ(faceNumber: number): Quaternion {
   const yaw = Quaternion.RotationAxis(up, target - cur)
 
   return yaw.multiply(align)
+}
+
+// Given the die's current rotation, returns the geometric face index whose
+// world normal points most upward (the face currently facing the camera).
+export function topFaceIndex(q: Quaternion): number {
+  const up = Vector3.Up()
+  let best = 0
+  let maxDot = -Infinity
+  for (let fi = 0; fi < DODEC_FACE_NORMALS.length; fi++) {
+    const wn = DODEC_FACE_NORMALS[fi].applyRotationQuaternion(q)
+    const d = Vector3.Dot(wn, up)
+    if (d > maxDot) { maxDot = d; best = fi }
+  }
+  return best
+}
+
+// Snap-to-nearest-face: aligns the die to whichever face is already on top,
+// flattening it cleanly without forcing a specific number.
+export function computeSettleQ(currentQ: Quaternion): Quaternion {
+  return computeTargetQForFace(topFaceIndex(currentQ))
 }

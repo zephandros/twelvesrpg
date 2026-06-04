@@ -10,6 +10,10 @@ export const DICE_CONFIG = {
   CORRECTION_DURATION_MS: 250,
   KEYFRAME_INTERVAL_MS: 33,
   MAX_SIM_DURATION_MS: 4000,
+  // Duración del destello del número (acento → contraste) al asentarse el dado.
+  GLOW_DURATION_MS: 550,
+  // Grosor del borde dibujado en las aristas de cada cara (para distinguirlas).
+  EDGE_WIDTH: 2,
   // Cámara casi cenital estilo Roll20: muy desde arriba, leve inclinación
   CAMERA_HEIGHT_FACTOR: 1.35,   // y = sWorld * factor
   CAMERA_Z_FACTOR: 0.30,        // z = sWorld * factor (leve tilt; 0 sería cenital puro)

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useDice } from '@/contexts/DiceContext'
 import { useAuth } from '@/hooks/useAuth'
+import { useTheme } from '@/contexts/ThemeContext'
 import { pushCurrentRoll, subscribeToCurrentRoll } from '@/lib/diceSync'
 import type { DiceEngineContext } from '@/features/dice/DiceEngine'
 import { createDiceEngine } from '@/features/dice/DiceEngine'
@@ -8,6 +9,7 @@ import { buildSimParams, runSimulation } from '@/features/dice/DiceSimulation'
 import { startPlayback } from '@/features/dice/DicePlayback'
 import type { DiceSceneHandle } from '@/features/dice/DiceHandle'
 import type { RollEvent } from '@/features/dice/types'
+import type { Mesh } from '@babylonjs/core'
 
 export default function DiceScene() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -18,6 +20,7 @@ export default function DiceScene() {
 
   const { lastRoll, setSettled, sessionId, settled } = useDice()
   const { user } = useAuth()
+  const { mode, ambiance } = useTheme()
 
   // Keep lastRoll ref fresh to avoid stale closures in callbacks
   useEffect(() => { lastRollRef.current = lastRoll }, [lastRoll])
@@ -31,38 +34,50 @@ export default function DiceScene() {
       if (disposed) { ctx.dispose(); return }
       engineCtxRef.current = ctx
 
+      const meshes: [Mesh, Mesh] = [ctx.dice[0].mesh, ctx.dice[1].mesh]
+
       const handle: DiceSceneHandle = {
         simulate(result) {
           cancelSimRef.current?.()
+          ctx.dice.forEach(d => d.blank())  // no numbers while rolling
 
           const sWorld = ctx.getSWorld()
           const params = buildSimParams({ die1: result[0], die2: result[1] }, sWorld)
 
           cancelSimRef.current = runSimulation(
             ctx.scene,
-            [ctx.die1, ctx.die2],
+            meshes,
             params,
             sWorld,
             (keyframes) => {
+              // Paint the result on the face that landed on top, then glow.
+              ctx.dice[0].showResult(result[0])
+              ctx.dice[1].showResult(result[1])
               handle.onSimulateComplete?.(keyframes)
               handle.onAnimationEnd?.()
             },
           )
         },
 
-        replay(keyframes) {
+        replay(keyframes, result) {
           cancelSimRef.current?.()
+          ctx.dice.forEach(d => d.blank())
+
           cancelSimRef.current = startPlayback(
             ctx.scene,
-            [ctx.die1, ctx.die2],
+            meshes,
             keyframes,
-            () => handle.onAnimationEnd?.(),
+            () => {
+              ctx.dice[0].showResult(result[0])
+              ctx.dice[1].showResult(result[1])
+              handle.onAnimationEnd?.()
+            },
           )
         },
 
         hideDice() {
-          ctx.die1.isVisible = false
-          ctx.die2.isVisible = false
+          meshes[0].isVisible = false
+          meshes[1].isVisible = false
         },
 
         onSimulateComplete: null,
@@ -134,9 +149,14 @@ export default function DiceScene() {
       if (!handleRef.current) return
 
       setSettled(false)
-      handleRef.current.replay(event.keyframes)
+      handleRef.current.replay(event.keyframes, [event.result.die1, event.result.die2])
     })
   }, [sessionId, user]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Recolor dice live when the theme/ambiance changes.
+  useEffect(() => {
+    engineCtxRef.current?.applyTheme()
+  }, [mode, ambiance])
 
   return (
     <canvas

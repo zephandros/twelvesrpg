@@ -9,25 +9,74 @@ import {
   HemisphericLight,
   Mesh,
   PBRMaterial,
+  Quaternion,
   Scene,
   Vector3,
   VertexData,
 } from '@babylonjs/core'
 import { DICE_CONFIG } from './diceConfig'
-import { dieSize, faceBasis, FACE_NUMBER } from './d12Normals'
+import { dieSize, faceBasis, FACE_NUMBER, topFaceIndex } from './d12Normals'
+
+// A single die's visual surface: its mesh, own material/textures, and helpers to
+// blank it (while rolling), paint the result number on the settled face, and
+// recolor it when the theme/ambiance changes.
+export interface DieVisual {
+  mesh: Mesh
+  /** Solid colour, no numbers — used while the die is rolling. */
+  blank: () => void
+  /** Paint `value` on the face currently on top, with an accent glow. */
+  showResult: (value: number) => void
+  /** Re-read theme colours and repaint body (+ number if shown). */
+  applyColors: () => void
+  /** (Re)build the edge outline; call after the mesh geometry changes. */
+  refreshEdges: () => void
+  dispose: () => void
+}
 
 export interface DiceEngineContext {
   engine: Engine
   scene: Scene
-  dieMat: PBRMaterial
-  die1: Mesh
-  die2: Mesh
+  dice: [DieVisual, DieVisual]
   getSWorld: () => number
+  /** Recolor both dice from the current theme/ambiance CSS variables. */
+  applyTheme: () => void
   dispose: () => void
 }
 
 function getSWorld(): number {
   return Math.min(window.innerWidth, window.innerHeight) / DICE_CONFIG.PIXEL_SCALE
+}
+
+// ---------------------------------------------------------------------------
+// Theme colours — read live from the app's CSS custom properties so the dice
+// match the current light/dark mode and ambiance.
+// ---------------------------------------------------------------------------
+
+interface ThemeColors {
+  body: Color3    // die body (= --color-ink: contrasts the page background)
+  letter: Color3  // number colour (= --color-surface: contrasts the die body)
+  accent: Color3  // glow flash (= --color-accent)
+}
+
+function readCssColor(name: string, fallback: string): Color3 {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  try {
+    return Color3.FromHexString(raw || fallback)
+  } catch {
+    return Color3.FromHexString(fallback)
+  }
+}
+
+function readThemeColors(): ThemeColors {
+  return {
+    body: readCssColor('--color-ink', '#ffffff'),
+    letter: readCssColor('--color-surface', '#111111'),
+    accent: readCssColor('--color-accent', '#888888'),
+  }
+}
+
+function hex(c: Color3): string {
+  return c.toHexString()
 }
 
 // ---------------------------------------------------------------------------
@@ -94,36 +143,54 @@ function buildDodecahedron(scale: number): VertexData {
 }
 
 // ---------------------------------------------------------------------------
-// Atlas texture — white background, black numbers (1–12), 4×3 grid
+// Atlas painting — 4×3 grid of 128px cells. The number for geometric face `fi`
+// lives in cell (FACE_NUMBER[fi]-1). Textures start solid (no numbers) and a
+// single cell is painted when the die settles.
 // ---------------------------------------------------------------------------
 
-function buildAtlas(scene: Scene): DynamicTexture {
-  const CW = 128, CH = 128
-  const tex = new DynamicTexture('diceAtlas', { width: CW * 4, height: CH * 3 }, scene)
+const CELL = 128
+const ATLAS_W = CELL * 4
+const ATLAS_H = CELL * 3
+
+function newAtlas(scene: Scene, name: string): DynamicTexture {
+  return new DynamicTexture(name, { width: ATLAS_W, height: ATLAS_H }, scene)
+}
+
+// Fill the whole texture with one colour (or transparent black for emissive).
+function fillSolid(tex: DynamicTexture, style: string): void {
   const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
+  ctx.clearRect(0, 0, ATLAS_W, ATLAS_H)
+  ctx.fillStyle = style
+  ctx.fillRect(0, 0, ATLAS_W, ATLAS_H)
+  tex.update()
+}
 
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, CW * 4, CH * 3)
+// Paint `value` in the cell of geometric face `faceIndex`, over a background
+// `bg` (pass null to keep transparent — used for the emissive glow layer).
+function paintNumberCell(
+  tex: DynamicTexture,
+  faceIndex: number,
+  value: number,
+  textStyle: string,
+  bg: string | null,
+): void {
+  const cell = FACE_NUMBER[faceIndex] - 1
+  const col = cell % 4
+  const row = Math.floor(cell / 4)
+  const cx = col * CELL + CELL / 2
+  const cy = row * CELL + CELL / 2
 
+  const ctx = tex.getContext() as unknown as CanvasRenderingContext2D
+  if (bg !== null) {
+    ctx.fillStyle = bg
+    ctx.fillRect(col * CELL, row * CELL, CELL, CELL)
+  }
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-
-  for (let i = 0; i < 12; i++) {
-    const cx = (i % 4) * CW + CW / 2
-    const cy = Math.floor(i / 4) * CH + CH / 2
-
-    ctx.beginPath()
-    ctx.arc(cx, cy, 46, 0, Math.PI * 2)
-    ctx.fillStyle = '#f0f0f0'
-    ctx.fill()
-
-    ctx.fillStyle = '#111111'
-    ctx.font = 'bold 54px system-ui, sans-serif'
-    ctx.fillText(String(i + 1), cx, cy)
-  }
-
+  ctx.fillStyle = textStyle
+  ctx.font = 'bold 54px system-ui, sans-serif'
+  ctx.fillText(String(value), cx, cy)
   tex.update()
-  return tex
 }
 
 // ---------------------------------------------------------------------------
@@ -156,37 +223,126 @@ export async function createDiceEngine(canvas: HTMLCanvasElement): Promise<DiceE
   hemi.diffuse = new Color3(1, 1, 1)
   hemi.groundColor = new Color3(1, 1, 1)
 
-  // PBR material
-  const dieMat = new PBRMaterial('d12mat', scene)
-  dieMat.roughness = 0.35
-  dieMat.metallic = 0.0
-  dieMat.albedoTexture = buildAtlas(scene)
-  // La geometría se construye con winding right-handed; Babylon es left-handed
-  // por defecto, así que sin esto el backface culling descartaría las caras
-  // exteriores y se vería la cara OPUESTA (el resultado salía invertido).
-  dieMat.backFaceCulling = false
-
-  // Meshes — geometry rebuilt to match the current play-area size so the die
-  // keeps a constant fraction of the screen across resolutions.
-  function makeDie(name: string): Mesh {
+  // Each die owns its own material + textures so numbers/glow are independent.
+  function makeDie(name: string): DieVisual {
     const mesh = new Mesh(name, scene)
-    mesh.material = dieMat
     mesh.isVisible = false
-    return mesh
+
+    const albedo = newAtlas(scene, `${name}-albedo`)
+    const emissive = newAtlas(scene, `${name}-emissive`)
+
+    const mat = new PBRMaterial(`${name}-mat`, scene)
+    mat.roughness = 0.35
+    mat.metallic = 0.0
+    mat.albedoTexture = albedo
+    mat.emissiveTexture = emissive
+    mat.emissiveColor = Color3.Black()
+    // La geometría se construye con winding right-handed; Babylon es left-handed
+    // por defecto, así que sin esto el backface culling descartaría las caras
+    // exteriores y se vería la cara OPUESTA (el resultado salía invertido).
+    mat.backFaceCulling = false
+    mesh.material = mat
+
+    let colors = readThemeColors()
+    let currentValue: number | null = null  // number painted on the settled face
+    let currentFace: number | null = null   // geometric face index it's painted on
+    let glowObs: ReturnType<typeof scene.onBeforeRenderObservable.add> | null = null
+
+    function stopGlow(): void {
+      if (glowObs) { scene.onBeforeRenderObservable.remove(glowObs); glowObs = null }
+    }
+
+    // Outline edges between faces, coloured with the contrast (letter) colour so
+    // they stand out against the die body. Babylon draws only "border" edges:
+    // our per-face duplicated vertices make the pentagon outlines borders while
+    // the internal fan diagonals (same normal) are skipped.
+    function applyEdgeColor(): void {
+      mesh.edgesColor = new Color4(colors.letter.r, colors.letter.g, colors.letter.b, 1)
+    }
+    function refreshEdges(): void {
+      mesh.disableEdgesRendering()
+      mesh.enableEdgesRendering()
+      mesh.edgesWidth = DICE_CONFIG.EDGE_WIDTH
+      applyEdgeColor()
+    }
+
+    function paintNumber(): void {
+      if (currentValue === null || currentFace === null) return
+      // Albedo: number in the contrast (letter) colour over the body colour.
+      paintNumberCell(albedo, currentFace, currentValue, hex(colors.letter), hex(colors.body))
+      // Emissive: number in accent for the glow flash.
+      fillSolid(emissive, '#000000')
+      paintNumberCell(emissive, currentFace, currentValue, hex(colors.accent), null)
+    }
+
+    const die: DieVisual = {
+      mesh,
+
+      blank() {
+        stopGlow()
+        currentValue = null
+        currentFace = null
+        fillSolid(albedo, hex(colors.body))
+        fillSolid(emissive, '#000000')
+        mat.emissiveColor = Color3.Black()
+      },
+
+      showResult(value) {
+        stopGlow()
+        currentValue = value
+        currentFace = topFaceIndex(mesh.rotationQuaternion ?? Quaternion.Identity())
+        paintNumber()
+
+        // Flash: emissive intensity goes from full → 0 over GLOW_DURATION_MS,
+        // leaving just the contrast-coloured number on the albedo.
+        const start = Date.now()
+        glowObs = scene.onBeforeRenderObservable.add(() => {
+          const t = Math.min(1, (Date.now() - start) / DICE_CONFIG.GLOW_DURATION_MS)
+          const k = 1 - t
+          mat.emissiveColor = new Color3(k, k, k)
+          if (t >= 1) stopGlow()
+        })
+      },
+
+      applyColors() {
+        colors = readThemeColors()
+        if (currentValue !== null) {
+          paintNumber()
+        } else {
+          fillSolid(albedo, hex(colors.body))
+        }
+        applyEdgeColor()
+      },
+
+      refreshEdges,
+
+      dispose() {
+        stopGlow()
+        mesh.disableEdgesRendering()
+        albedo.dispose()
+        emissive.dispose()
+        mat.dispose()
+        mesh.dispose()
+      },
+    }
+
+    return die
   }
 
-  const die1 = makeDie('die1')
-  const die2 = makeDie('die2')
+  const dice: [DieVisual, DieVisual] = [makeDie('die1'), makeDie('die2')]
 
   // (Re)bakes the dodecahedron geometry at size = sWorld * D12_SIZE_FACTOR onto
   // both dice. Baking real vertex positions (instead of mesh.scaling) keeps the
   // Havok convex hull exact.
   function rebuildDice(): void {
     const vd = buildDodecahedron(dieSize(getSWorld()))
-    vd.applyToMesh(die1)
-    vd.applyToMesh(die2)
+    vd.applyToMesh(dice[0].mesh)
+    vd.applyToMesh(dice[1].mesh)
+    // Edges are tied to the geometry; rebuild them after re-baking vertices.
+    dice.forEach(d => d.refreshEdges())
   }
   rebuildDice()
+  dice.forEach(d => d.blank())
 
   engine.runRenderLoop(() => scene.render())
 
@@ -202,12 +358,12 @@ export async function createDiceEngine(canvas: HTMLCanvasElement): Promise<DiceE
   return {
     engine,
     scene,
-    dieMat,
-    die1,
-    die2,
+    dice,
     getSWorld,
+    applyTheme: () => dice.forEach(d => d.applyColors()),
     dispose: () => {
       window.removeEventListener('resize', onResize)
+      dice.forEach(d => d.dispose())
       engine.dispose()
     },
   }

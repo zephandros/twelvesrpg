@@ -8,7 +8,7 @@ import {
   Vector3,
 } from '@babylonjs/core'
 import { DICE_CONFIG, THROW_CONFIG } from './diceConfig'
-import { computeTargetQ, dieRestY } from './d12Normals'
+import { computeSettleQ, dieRestY } from './d12Normals'
 import type { DieSimParams, Keyframe, RollResult } from './types'
 
 // ---------------------------------------------------------------------------
@@ -259,7 +259,9 @@ export function runSimulation(
             s.correctionStart = now
             s.correctionStartQ = meshes[i].rotationQuaternion!.clone()
             s.correctionStartY = meshes[i].position.y
-            s.correctionTargetQ = computeTargetQ(params[i].targetFace)
+            // Snap to whichever face already landed on top — la física ya no se
+            // amaña hacia un número; el número se pinta luego en la cara visible.
+            s.correctionTargetQ = computeSettleQ(meshes[i].rotationQuaternion!)
           }
         } else {
           s.settleCount = 0
