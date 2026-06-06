@@ -111,6 +111,14 @@ export function dieRestY(sWorld: number): number {
   return D12_UNIT_INRADIUS * dieSize(sWorld)
 }
 
+// Medio-lado del muro de juego: un cuadrado centrado, separado del borde de la
+// ventana (sWorld/2) por un margen proporcional al tamaño del dado. Los dados
+// rebotan dentro de este cuadrado y se mantienen centrados en pantalla.
+export function wallHalfExtent(sWorld: number): number {
+  const margin = dieSize(sWorld) * DICE_CONFIG.WALL_MARGIN_DIE_FACTOR
+  return Math.max(dieSize(sWorld), sWorld / 2 - margin)
+}
+
 // ---------------------------------------------------------------------------
 // d12 face numbering (real-die layout)
 // ---------------------------------------------------------------------------

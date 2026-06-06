@@ -16,6 +16,7 @@ import {
 } from '@babylonjs/core'
 import { DICE_CONFIG } from './diceConfig'
 import { dieSize, faceBasis, FACE_NUMBER, topFaceIndex } from './d12Normals'
+import { playAreaScale } from './DiceSimulation'
 
 // A single die's visual surface: its mesh, own material/textures, and helpers to
 // blank it (while rolling), paint the result number on the settled face, and
@@ -280,15 +281,21 @@ export async function createDiceEngine(canvas: HTMLCanvasElement): Promise<DiceE
 
       blank() {
         stopGlow()
+        // Re-read theme colours live so each roll matches the current ambiance,
+        // even if the React theme effect hasn't fired (e.g. ambiance set
+        // outside the normal flow).
+        colors = readThemeColors()
         currentValue = null
         currentFace = null
         fillSolid(albedo, hex(colors.body))
         fillSolid(emissive, '#000000')
         mat.emissiveColor = Color3.Black()
+        applyEdgeColor()
       },
 
       showResult(value) {
         stopGlow()
+        colors = readThemeColors()  // live colours for the painted number
         currentValue = value
         currentFace = topFaceIndex(mesh.rotationQuaternion ?? Quaternion.Identity())
         paintNumber()
@@ -335,7 +342,9 @@ export async function createDiceEngine(canvas: HTMLCanvasElement): Promise<DiceE
   // both dice. Baking real vertex positions (instead of mesh.scaling) keeps the
   // Havok convex hull exact.
   function rebuildDice(): void {
-    const vd = buildDodecahedron(dieSize(getSWorld()))
+    // El tamaño del dado escala con la CAJA (no con la pantalla): así en
+    // widescreen el dado queda proporcional al cuadro acotado y no lo atraviesa.
+    const vd = buildDodecahedron(dieSize(playAreaScale(scene, getSWorld())))
     vd.applyToMesh(dice[0].mesh)
     vd.applyToMesh(dice[1].mesh)
     // Edges are tied to the geometry; rebuild them after re-baking vertices.

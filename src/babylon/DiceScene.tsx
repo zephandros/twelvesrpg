@@ -42,7 +42,7 @@ export default function DiceScene() {
           ctx.dice.forEach(d => d.blank())  // no numbers while rolling
 
           const sWorld = ctx.getSWorld()
-          const params = buildSimParams({ die1: result[0], die2: result[1] }, sWorld)
+          const params = buildSimParams({ die1: result[0], die2: result[1] }, ctx.scene, sWorld)
 
           cancelSimRef.current = runSimulation(
             ctx.scene,
@@ -112,11 +112,14 @@ export default function DiceScene() {
 
     handle.onSimulateComplete = async (keyframes) => {
       if (!sessionId) return
+      const ctx = engineCtxRef.current
+      if (!ctx) return
       const event: RollEvent = {
         result: { die1: roll.values[0], die2: roll.values[1] },
         params: buildSimParams(
           { die1: roll.values[0], die2: roll.values[1] },
-          engineCtxRef.current?.getSWorld() ?? 6,
+          ctx.scene,
+          ctx.getSWorld(),
         ),
         keyframes,
         timestamp: Date.now(),

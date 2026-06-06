@@ -14,6 +14,18 @@ export const DICE_CONFIG = {
   GLOW_DURATION_MS: 550,
   // Grosor del borde dibujado en las aristas de cada cara (para distinguirlas).
   EDGE_WIDTH: 2,
+  // Separación del muro respecto al borde de la ventana, como factor del tamaño
+  // del dado. 0.5 = medio dado de margen por lado, así los dados no se salen de
+  // pantalla y se mantienen centrados.
+  WALL_MARGIN_DIE_FACTOR: 0.5,
+  // Tamaño MÁXIMO del cuadro de juego en píxeles de pantalla, separado por eje.
+  // En móvil la ventana es menor que esto, así que el cuadro llena la pantalla;
+  // en widescreen el cuadro se fija a estos tamaños y queda centrado.
+  PLAY_AREA_MAX_W_PX: 375,  // ancho máximo (eje X / horizontal)
+  PLAY_AREA_MAX_H_PX: 512,  // alto máximo (eje Z / vertical en pantalla)
+  // Fracción del área visible que ocupa el cuadro (un pequeño margen interior
+  // para que las paredes no queden pegadas al borde / fuera de cuadro).
+  PLAY_AREA_FILL: 0.96,
   // Cámara casi cenital estilo Roll20: muy desde arriba, leve inclinación
   CAMERA_HEIGHT_FACTOR: 1.35,   // y = sWorld * factor
   CAMERA_Z_FACTOR: 0.30,        // z = sWorld * factor (leve tilt; 0 sería cenital puro)
