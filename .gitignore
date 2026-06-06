@@ -41,3 +41,6 @@ pnpm-workspace.yaml
 # Misc
 .cache/
 coverage/
+
+# Local resources (design handoffs, specs, references)
+resources/
